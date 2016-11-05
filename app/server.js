@@ -10,6 +10,14 @@ function emulateServerReturn(data, cb) {
   }, 4);
 }
 
+function getCommentSync(feedItemId, commentIndex){
+  var feedItem = readDocument('feedItems', feedItemId);
+  var comment = feedItem.comments[commentIndex];
+  comment.likeCounter = comment.likeCounter.map((id) => readDocument('users', id));
+  comment.author = readDocument('users', comment.author);
+  return comment;
+}
+
 /**
 * Given a feed item ID, returns a FeedItem object with references resolved.
 * Internal to the server, since it's synchronous.
@@ -23,7 +31,7 @@ function getFeedItemSync(feedItemId) {
   // need to check the type and have logic for each type.
   feedItem.contents.author = readDocument('users', feedItem.contents.author);
   // Resolve comment author.
-  feedItem.comments.forEach((comment) => {comment.author = readDocument('users', comment.author);});
+  feedItem.comments.map((comment, i) => getCommentSync(feedItemId, i));
   return feedItem;
 }
 
@@ -97,7 +105,8 @@ export function postComment(feedItemId, author, contents, cb) {
   feedItem.comments.push({
     "author": author,
     "contents": contents,
-    "postDate": new Date().getTime()
+    "postDate": new Date().getTime(),
+    "likeCounter": []
   });
   writeDocument('feedItems', feedItem);
   // Return a resolved version of the feed item so React can
@@ -120,7 +129,7 @@ export function likeFeedItem(feedItemId, userId, cb) {
   writeDocument('feedItems', feedItem);
   // Return a resolved version of the likeCounter
   emulateServerReturn(feedItem.likeCounter.map((userId) =>
-  readDocument('users', userId)), cb);
+    readDocument('users', userId)), cb);
 }
 
 /**
@@ -146,5 +155,25 @@ export function unlikeFeedItem(feedItemId, userId, cb) {
   }
   // Return a resolved version of the likeCounter
   emulateServerReturn(feedItem.likeCounter.map((userId) =>
-  readDocument('users', userId)), cb);
+    readDocument('users', userId)), cb);
+}
+
+export function likeComment(feedItemId, commentIndex, userId, cb){
+  var feedItem = readDocument('feedItems',feedItemId);
+  feedItem.comments[commentIndex].likeCounter.push(userId);
+  writeDocument('feedItems', feedItem);
+  emulateServerReturn(feedItem.comments[commentIndex].likeCounter.map((userId) =>
+    readDocument('users', userId)), cb);
+
+}
+
+export function unlikeComment(feedItemId, commentIndex, userId, cb) {
+  var feedItem = readDocument('feedItems', feedItemId);
+  var userIndex = feedItem.comments[commentIndex].likeCounter.indexOf(userId);
+  if (userIndex !== -1) {
+    feedItem.comments[commentIndex].likeCounter.splice(userIndex, 1);
+    writeDocument('feedItems', feedItem);
+  }
+  emulateServerReturn(feedItem.comments[commentIndex].likeCounter.map((userId) =>
+    readDocument('users', userId)), cb);
 }

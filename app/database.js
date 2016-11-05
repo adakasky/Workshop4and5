@@ -35,9 +35,7 @@ var initialData = {
       "_id": 1,
       // A list of users that liked the post. Here, "Someone Else" and "Another Person"
       // liked this particular post.
-      "likeCounter": [
-        2, 3
-      ],
+      "likeCounter": [2, 3],
       // The type and contents of this feed item. This item happens to be a status
       // update.
       "type": "statusUpdate",
@@ -56,6 +54,8 @@ var initialData = {
         {
           // The author of the comment.
           "author": 2,
+          // A list of users that liked the comment
+          "likeCounter": [3],
           // The contents of the comment.
           "contents": "hope everything is ok!",
           // The date the comment was posted.
@@ -64,6 +64,7 @@ var initialData = {
         },
         {
           "author": 3,
+          "likeCounter": [1],
           "contents": "sending hugs your way",
           "postDate": 1453690800000
         }

@@ -71,10 +71,10 @@ export default class FeedItem extends React.Component {
   }
 
   render() {
-var likeButtonText = "Like";
-if (this.didUserLike()) {
-likeButtonText = "Unlike";
-}
+    var likeButtonText = "Like";
+    if (this.didUserLike()) {
+      likeButtonText = "Unlike";
+    }
     // Render using data from state.
     var data = this.state;
     var contents;
@@ -147,7 +147,11 @@ likeButtonText = "Unlike";
                 return (
                   <Comment key={i}
                     author={comment.author}
-                    postDate={comment.postDate}>
+                    postDate={comment.postDate}
+                    likeCounter={comment.likeCounter}
+                    feedItemId={data._id}
+                    data={comment}
+                    commentIndex={i}>
                     {comment.contents}
                   </Comment>
                 );
