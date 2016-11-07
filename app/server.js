@@ -10,14 +10,6 @@ function emulateServerReturn(data, cb) {
   }, 4);
 }
 
-function getCommentSync(feedItemId, commentIndex){
-  var feedItem = readDocument('feedItems', feedItemId);
-  var comment = feedItem.comments[commentIndex];
-  comment.likeCounter = comment.likeCounter.map((id) => readDocument('users', id));
-  comment.author = readDocument('users', comment.author);
-  return comment;
-}
-
 /**
 * Given a feed item ID, returns a FeedItem object with references resolved.
 * Internal to the server, since it's synchronous.
