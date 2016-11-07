@@ -31,7 +31,10 @@ function getFeedItemSync(feedItemId) {
   // need to check the type and have logic for each type.
   feedItem.contents.author = readDocument('users', feedItem.contents.author);
   // Resolve comment author.
-  feedItem.comments.map((comment, i) => getCommentSync(feedItemId, i));
+  feedItem.comments.forEach((comment) => {
+    comment.author = readDocument('users', comment.author);
+    comment.likeCounter = comment.likeCounter.map((id)=>readDocument('users',id));
+  });
   return feedItem;
 }
 
